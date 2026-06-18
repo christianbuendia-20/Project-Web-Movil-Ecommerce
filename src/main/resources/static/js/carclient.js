@@ -32,9 +32,12 @@ function renderCart() {
 
     let itemsHtml = '<a class="continue-btn" href="/catalogclient">Seguir comprando</a>';
     cart.forEach((item, index) => {
+        const imgHtml = item.imagenUrl
+            ? `<img src="${item.imagenUrl}" alt="${item.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+            : '📦';
         itemsHtml += `
             <article class="cart-item" data-product-id="${item.idProducto}" data-price="${item.precio}" data-index="${index}">
-                <div class="item-image">📦</div>
+                <div class="item-image" style="overflow:hidden;">${imgHtml}</div>
                 <div class="item-info">
                     <h2>${item.nombre}</h2>
                     <p>S/ ${Number(item.precio).toFixed(2)} · ${item.stock} und. disponibles</p>
@@ -138,7 +141,10 @@ document.querySelector(".payment-form").addEventListener("submit", async (event)
     }
 
     const totalText = totalElement?.textContent || 'S/ 0.00';
-    const confirmed = await showConfirm(`¿Confirmar el pago por <strong>${totalText}</strong>?`, 'success', 'Pagar');
+    const confirmed = await showConfirm(
+        `¿Confirmar el pedido por <strong>${totalText}</strong>? Serás redirigido a Mercado Pago para completar el pago.`,
+        'success', 'Continuar'
+    );
     if (!confirmed) return;
 
     const direccionInput = document.querySelector("input[name='direccion']");
@@ -151,7 +157,14 @@ document.querySelector(".payment-form").addEventListener("submit", async (event)
         cantidad: item.cantidad
     }));
 
+    const submitBtn = document.querySelector(".payment-form button[type='submit']");
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Procesando...';
+    }
+
     try {
+        // Paso 1: crear la orden
         const checkoutRes = await fetch("/api/ventas/checkout", {
             method: "POST",
             headers: getAuthHeaders(),
@@ -165,32 +178,40 @@ document.querySelector(".payment-form").addEventListener("submit", async (event)
 
         if (!checkoutRes.ok) {
             const err = await checkoutRes.json().catch(() => ({}));
-            showToast(err.mensaje || "Error en el checkout", 'error');
+            showToast(err.mensaje || "Error al crear el pedido", 'error');
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Pagar con Mercado Pago 🔒'; }
             return;
         }
 
         const venta = await checkoutRes.json();
 
-        try {
-            await fetch("/api/pagos/registrar", {
-                method: "POST",
-                headers: getAuthHeaders(),
-                body: JSON.stringify({
-                    idVenta: venta.idVenta,
-                    metodoPago: "TARJETA",
-                    monto: cart.reduce((s, item) => s + item.precio * item.cantidad, 0) * 1.18,
-                    transaccionId: "TRX-" + Date.now()
-                })
-            });
-        } catch (_) {}
+        // Paso 2: crear preferencia en Mercado Pago
+        const prefRes = await fetch("/api/payments/preference", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ idVenta: venta.idVenta })
+        });
 
-        localStorage.removeItem('cart');
-        showToast(`¡Pedido #${venta.idVenta} confirmado!`, 'success');
-        renderCart();
-        document.querySelector(".payment-form")?.reset();
+        if (!prefRes.ok) {
+            const err = await prefRes.json().catch(() => ({}));
+            showToast(err.mensaje || "Error al conectar con Mercado Pago", 'error');
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Pagar con Mercado Pago 🔒'; }
+            return;
+        }
+
+        const preference = await prefRes.json();
+
+        // Paso 3: redirigir al checkout de Mercado Pago (Sandbox)
+        // Marcar que hay un pago en progreso para que Mis Pedidos refresque al volver
+        sessionStorage.setItem('postPaymentRefresh', '1');
+        window.location.href = preference.checkoutUrl;
 
     } catch (e) {
         showToast("Error de conexión con el servidor", 'error');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Pagar con Mercado Pago 🔒';
+        }
     }
 });
 

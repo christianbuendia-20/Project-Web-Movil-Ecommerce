@@ -1,32 +1,118 @@
 const searchInput = document.getElementById("searchInput");
 const statusFilter = document.getElementById("statusFilter");
 
+let selectedImageFile = null;
+
+function handleImageSelect(input) {
+    if (!input.files || !input.files[0]) return;
+    selectedImageFile = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const preview = document.getElementById('imagePreview');
+        if (preview) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="preview" style="max-width:100%;max-height:110px;border-radius:8px;object-fit:cover;">`;
+        }
+    };
+    reader.readAsDataURL(selectedImageFile);
+}
+
+function handleImageDrop(e) {
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!file) return;
+    selectedImageFile = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const preview = document.getElementById('imagePreview');
+        if (preview) {
+            preview.innerHTML = `<img src="${ev.target.result}" alt="preview" style="max-width:100%;max-height:110px;border-radius:8px;object-fit:cover;">`;
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+function buildImageZone(currentImgUrl) {
+    const previewHtml = currentImgUrl
+        ? `<img src="${currentImgUrl}" alt="imagen actual" style="max-width:100%;max-height:110px;border-radius:8px;object-fit:cover;">`
+        : `<div style="color:var(--text-secondary);font-size:13px;">📷 Haz clic o arrastra una imagen aquí</div>`;
+    return `
+        <label class="field">
+            <span>Imagen del producto <small style="color:var(--text-secondary);font-weight:400;">(JPG, PNG, WEBP · máx. 5 MB)</small></span>
+            <div id="imageUploadZone"
+                 style="border:2px dashed var(--field-border);border-radius:var(--radius-field);padding:20px 16px;text-align:center;background:var(--field-bg);cursor:pointer;transition:border-color .2s;"
+                 onclick="document.getElementById('imagenFileInput').click()"
+                 ondragover="event.preventDefault();this.style.borderColor='var(--primary)'"
+                 ondragleave="this.style.borderColor='var(--field-border)'"
+                 ondrop="event.preventDefault();this.style.borderColor='var(--field-border)';handleImageDrop(event)">
+                <input type="file" id="imagenFileInput" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="handleImageSelect(this)">
+                <div id="imagePreview">${previewHtml}</div>
+            </div>
+        </label>`;
+}
+
+async function uploadImage(productId) {
+    if (!selectedImageFile) return;
+    const fd = new FormData();
+    fd.append('file', selectedImageFile);
+    const token = localStorage.getItem('token');
+    const headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    try {
+        await fetch(`/api/admin/productos/${productId}/imagen`, {
+            method: 'POST',
+            headers,
+            body: fd
+        });
+    } catch (_) {
+        showToast('Error al subir la imagen', 'error');
+    }
+    selectedImageFile = null;
+}
+
 async function loadProducts() {
+    const grid = document.getElementById("productGrid");
     try {
         const res = await fetch("/api/admin/productos", { headers: getAuthHeaders() });
-        if (!res.ok) return;
+        if (!res.ok) {
+            const errorText = res.status === 401 || res.status === 403
+                ? 'Sin autorización. Inicia sesión como administrador.'
+                : `Error al cargar productos (${res.status})`;
+            if (grid) grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:40px;color:#e53e3e;">${errorText}</p>`;
+            return;
+        }
         const products = await res.json();
-        const grid = document.getElementById("productGrid");
         if (!grid) return;
         if (!Array.isArray(products) || products.length === 0) {
             grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">No hay productos registrados</p>';
             return;
         }
-        grid.innerHTML = products.map(p => `
+        grid.innerHTML = products.map(p => {
+            const imgHtml = p.imagenUrl
+                ? `<img src="${p.imagenUrl}" alt="${p.nombre}" style="width:100%;height:100%;object-fit:cover;">`
+                : '📦';
+            return `
             <article class="admin-product-card" data-product-id="${p.idProducto}" data-name="${p.nombre}" data-status="${p.activo ? 'activo' : 'inactivo'}">
                 <span class="status-badge ${p.activo ? 'active' : 'inactive'}">${p.activo ? 'Activo' : 'Inactivo'}</span>
-                <div class="product-image">📦</div>
+                <div class="product-image" style="overflow:hidden;">${imgHtml}</div>
                 <h2>${p.nombre}</h2>
                 <p>${p.categoria?.nombre || p.nombreCategoria || ''} · S/ ${Number(p.precio).toFixed(2)} · ${p.stock} und.</p>
                 <div class="admin-product-actions">
-                    <button class="edit-product-btn" data-id="${p.idProducto}" data-nombre="${p.nombre}" data-descripcion="${(p.descripcion || '').replace(/"/g, '&quot;')}" data-precio="${p.precio}" data-stock="${p.stock}" data-categoria="${p.categoria?.idCategoria || p.idCategoria || ''}" data-proveedor="${p.proveedor?.idProveedor || p.idProveedor || ''}">✏️ Editar</button>
+                    <button class="edit-product-btn"
+                        data-id="${p.idProducto}"
+                        data-nombre="${p.nombre}"
+                        data-descripcion="${(p.descripcion || '').replace(/"/g, '&quot;')}"
+                        data-precio="${p.precio}"
+                        data-stock="${p.stock}"
+                        data-categoria="${p.categoria?.idCategoria || p.idCategoria || ''}"
+                        data-proveedor="${p.proveedor?.idProveedor || p.idProveedor || ''}"
+                        data-imagen="${p.imagenUrl || ''}">✏️ Editar</button>
                     <button class="toggle-product-btn" data-id="${p.idProducto}" data-activo="${p.activo}">${p.activo ? '🚫 Desactivar' : '✅ Activar'}</button>
                 </div>
-            </article>
-        `).join('');
+            </article>`;
+        }).join('');
         filterProducts();
     } catch (e) {
-        showToast("Error al cargar productos", 'error');
+        console.error("loadProducts:", e);
+        if (grid) grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#e53e3e;">Error de conexión con el servidor</p>';
     }
 }
 
@@ -48,6 +134,7 @@ statusFilter.addEventListener("change", filterProducts);
 document.getElementById("productGrid").addEventListener("click", async (e) => {
     const editBtn = e.target.closest('.edit-product-btn');
     if (editBtn) {
+        selectedImageFile = null;
         const id = editBtn.dataset.id;
         const data = await showFormModal('Editar Producto', `
             <label class="field">
@@ -68,6 +155,7 @@ document.getElementById("productGrid").addEventListener("click", async (e) => {
                     <input type="number" name="stock" value="${editBtn.dataset.stock}" required>
                 </label>
             </div>
+            ${buildImageZone(editBtn.dataset.imagen)}
         `, 'Guardar Cambios');
         if (!data) return;
         try {
@@ -84,6 +172,7 @@ document.getElementById("productGrid").addEventListener("click", async (e) => {
                 })
             });
             if (res.ok) {
+                if (selectedImageFile) await uploadImage(Number(id));
                 showToast(`Producto "${data.nombre}" actualizado`, 'success');
                 loadProducts();
             } else {
@@ -110,10 +199,9 @@ document.getElementById("productGrid").addEventListener("click", async (e) => {
                     headers: getAuthHeaders()
                 });
             } else {
-                res = await fetch(`/api/admin/productos/${id}`, {
+                res = await fetch(`/api/admin/productos/${id}/activar`, {
                     method: "PUT",
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ activo: true })
+                    headers: getAuthHeaders()
                 });
             }
             if (res.ok) {
@@ -130,6 +218,7 @@ document.getElementById("productGrid").addEventListener("click", async (e) => {
 });
 
 document.getElementById("newProductBtn").addEventListener("click", async () => {
+    selectedImageFile = null;
     const data = await showFormModal('Nuevo Producto', `
         <label class="field">
             <span>Nombre del producto</span>
@@ -159,6 +248,7 @@ document.getElementById("newProductBtn").addEventListener("click", async () => {
                 <input type="number" name="proveedorId" placeholder="1" value="1">
             </label>
         </div>
+        ${buildImageZone(null)}
     `, 'Crear Producto');
     if (!data) return;
     try {
@@ -175,6 +265,10 @@ document.getElementById("newProductBtn").addEventListener("click", async () => {
             })
         });
         if (res.ok) {
+            const created = await res.json();
+            if (selectedImageFile && created.idProducto) {
+                await uploadImage(created.idProducto);
+            }
             showToast(`Producto "${data.nombre}" creado`, 'success');
             loadProducts();
         } else {

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Pago Exitoso')}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/payment-result.css}">
+    <style>
+        .order-summary {
+            margin-top: 28px;
+            text-align: left;
+            border-top: 1px solid #e5dcff;
+            padding-top: 20px;
+        }
+        .order-summary h3 {
+            margin: 0 0 14px;
+            color: #2d236a;
+            font-size: 1rem;
+            font-weight: 900;
+        }
+        .order-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 16px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+        }
+        .order-meta span { color: #7d8494; font-weight: 600; }
+        .order-meta strong { color: #151b2d; font-weight: 900; }
+        .order-product-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-top: 1px solid #f0ebff;
+            font-size: 0.85rem;
+        }
+        .order-product-row img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .order-product-row .prod-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #2368f5, #842ff0);
+            font-size: 1.1rem;
+        }
+        .order-product-row .prod-info { flex: 1; }
+        .order-product-row .prod-info p { margin: 0; color: #7d8494; font-weight: 700; }
+        .order-product-row .prod-price { font-weight: 900; color: #2368f5; }
+        .order-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid #dacdff;
+            font-weight: 900;
+            font-size: 1rem;
+            color: #2d236a;
+        }
+        #orderSummary { display: none; }
+    </style>
+</head>
+
+<body>
+<div class="result-page">
+    <div th:replace="~{fragments/navbar-client :: navbar}"></div>
+
+    <div class="result-container">
+        <div class="result-card">
+            <div class="result-icon">✅</div>
+            <h1>¡Pago Exitoso!</h1>
+            <p class="subtitle">Tu pedido ha sido confirmado y está siendo procesado.</p>
+            <p class="order-ref" id="orderId"></p>
+
+            <div class="status-note success" id="statusNote" style="display:none;"></div>
+
+            <!-- Resumen del pedido (se rellena con JS) -->
+            <div class="order-summary" id="orderSummary">
+                <h3>Resumen del pedido</h3>
+                <div class="order-meta" id="orderMeta"></div>
+                <div id="orderProducts"></div>
+                <div class="order-total-row">
+                    <span>Total pagado</span>
+                    <strong id="orderTotal"></strong>
+                </div>
+            </div>
+
+            <div class="result-actions" style="margin-top:28px;">
+                <a href="/myorders" class="btn-primary">Ver mis pedidos</a>
+                <a href="/catalogclient" class="btn-secondary">Seguir comprando</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/payment-result.js}"></script>
+</body>
+
+</html>

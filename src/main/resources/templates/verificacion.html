@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Verificar cuenta')}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/verificacion.css}">
+</head>
+<body>
+<div class="page-shell">
+    <main class="verify-main">
+        <section class="register-card verify-card">
+
+            <!-- Ícono animado -->
+            <div class="verify-icon-wrap">
+                <div class="verify-icon">✉️</div>
+            </div>
+
+            <!-- Encabezado -->
+            <header class="brand-block">
+                <h1>Verifica tu correo</h1>
+                <p id="emailHint" class="email-hint">Enviamos un código de 6 dígitos a tu correo.</p>
+            </header>
+
+            <!-- Temporizador -->
+            <div class="timer-row">
+                <span class="timer-label">Código válido por:</span>
+                <span class="timer-badge" id="timerDisplay">15:00</span>
+            </div>
+
+            <!-- Inputs OTP: 6 casillas individuales -->
+            <div class="otp-wrap" id="otpWrap">
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 1">
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 2">
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 3">
+                <span class="otp-sep">—</span>
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 4">
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 5">
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 6">
+            </div>
+
+            <!-- Mensaje de estado -->
+            <p class="form-message" id="verifyMessage" aria-live="polite"></p>
+
+            <!-- Botón verificar -->
+            <button type="button" class="button button-primary verify-btn" id="verifyBtn" onclick="handleVerify()">
+                Verificar cuenta
+            </button>
+
+            <!-- Reenviar código -->
+            <div class="resend-row">
+                <span>¿No recibiste el código?</span>
+                <button type="button" class="resend-btn" id="resendBtn" onclick="handleResend()" disabled>
+                    Reenviar código
+                    <span class="resend-countdown" id="resendCountdown">(60s)</span>
+                </button>
+            </div>
+
+            <!-- Volver al login -->
+            <a th:href="@{/login}" class="back-link">← Volver al inicio de sesión</a>
+
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/verificacion.js}" defer></script>
+</body>
+</html>

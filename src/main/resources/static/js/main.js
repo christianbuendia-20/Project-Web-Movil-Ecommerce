@@ -127,11 +127,12 @@ function showConfirm(message, type = 'warning', confirmLabel = 'Confirmar') {
         `;
         openModal(html);
         document.getElementById('confirmBtn').addEventListener('click', () => {
-            closeModal();
             if (modalResolve) {
-                modalResolve(true);
+                const resolve = modalResolve;
                 modalResolve = null;
+                resolve(true);
             }
+            closeModal();
         });
     });
 }

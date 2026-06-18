@@ -181,22 +181,61 @@ body {
     padding: 0 14px;
 }
 
-.badge.pending {
+.badge.pending,
+.badge.pendiente {
     border: 1px solid #e2b84a;
     background: #ffe7a5;
     color: #c88400;
 }
 
+.badge.pendiente-pago {
+    border: 1px solid #f5a623;
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.badge.pagada {
+    border: 1px solid #47db8a;
+    background: #d9fbe6;
+    color: #13a953;
+}
+
+.badge.pago-rechazado {
+    border: 1px solid #ff8080;
+    background: #ffe4e4;
+    color: #c92a2a;
+}
+
+.badge.pago-cancelado {
+    border: 1px solid #c0c0c0;
+    background: #f0f0f0;
+    color: #666;
+}
+
+.badge.en-proceso,
 .badge.transit {
     border: 1px solid #70a7ff;
     background: #dceaff;
     color: #2d72ff;
 }
 
+.badge.enviada {
+    border: 1px solid #a78bfa;
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.badge.entregada,
 .badge.received {
     border: 1px solid #47db8a;
     background: #d9fbe6;
     color: #13a953;
+}
+
+.badge.cancelada {
+    border: 1px solid #c0c0c0;
+    background: #f0f0f0;
+    color: #666;
 }
 
 .order-product {

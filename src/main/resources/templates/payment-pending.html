@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Pago Pendiente')}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/payment-result.css}">
+</head>
+
+<body>
+<div class="result-page">
+    <div th:replace="~{fragments/navbar-client :: navbar}"></div>
+
+    <div class="result-container">
+        <div class="result-card">
+            <div class="result-icon">⏳</div>
+            <h1>Pago Pendiente</h1>
+            <p class="subtitle">Tu pago está siendo procesado por Mercado Pago.</p>
+            <p class="order-ref" id="orderId"></p>
+
+            <div class="status-note warning">
+                Recibirás una notificación cuando el pago sea confirmado. Puedes revisar el estado de tu pedido en "Mis Pedidos".
+            </div>
+
+            <div class="result-actions">
+                <a href="/myorders" class="btn-primary">Ver mis pedidos</a>
+                <a href="/catalogclient" class="btn-secondary">Seguir comprando</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/payment-result.js}"></script>
+</body>
+
+</html>

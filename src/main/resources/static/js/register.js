@@ -45,9 +45,13 @@ form.addEventListener("submit", async (event) => {
     });
 
     if (res.ok) {
-      message.textContent = "¡Cuenta creada con éxito! Redirigiendo al login...";
+      message.textContent = "¡Cuenta creada! Redirigiendo a la verificación...";
       message.classList.add("success");
-      setTimeout(() => window.location.href = "/login", 2000);
+      // Guardar email para que la página de verificación lo use
+      sessionStorage.setItem("pendingVerifyEmail", email);
+      setTimeout(() => {
+        window.location.href = "/verificar-email?email=" + encodeURIComponent(email);
+      }, 1500);
     } else {
       const err = await res.json().catch(() => ({}));
       message.textContent = err.mensaje || err.error || "Error al registrar. Intenta de nuevo.";

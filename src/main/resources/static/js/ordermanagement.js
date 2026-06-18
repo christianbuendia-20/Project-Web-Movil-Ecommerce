@@ -19,7 +19,7 @@ async function updateOrderStatus(orderId, newStatus) {
     }
 }
 
-const STATE_ORDER = ['PENDIENTE', 'PROCESANDO', 'PAGADA', 'ENVIADA', 'EN_CAMINO', 'ENTREGADA', 'COMPLETADO', 'CANCELADA'];
+const STATE_ORDER = ['PENDIENTE', 'PAGADA', 'ENVIADA', 'ENTREGADA', 'CANCELADA'];
 
 function getNextState(currentState) {
     const idx = STATE_ORDER.indexOf(currentState);

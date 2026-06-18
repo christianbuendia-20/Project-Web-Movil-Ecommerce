@@ -50,7 +50,7 @@ form.addEventListener("submit", async (event) => {
     if (res.ok && data.success) {
       message.textContent = "¡Bienvenido! Redirigiendo...";
       message.classList.add("success");
-      
+
       if (data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("userEmail", email);
@@ -61,10 +61,17 @@ form.addEventListener("submit", async (event) => {
           if (payload.idUsuario) localStorage.setItem("userId", payload.idUsuario);
         } catch (_) {}
       }
-      
+
       setTimeout(() => {
         window.location.href = data.redirectUrl || getRedirectUrl(rol);
       }, 1500);
+    } else if (data.requiresVerification) {
+      // La cuenta existe pero no está verificada → redirigir a verificación
+      message.innerHTML =
+        'Debes verificar tu correo antes de ingresar. ' +
+        '<a href="/verificar-email?email=' + encodeURIComponent(email) +
+        '" style="color:var(--primary);font-weight:700;">Verificar ahora →</a>';
+      message.classList.add("error");
     } else {
       message.textContent = data.error || data.mensaje || "Error al iniciar sesión.";
       message.classList.add("error");
