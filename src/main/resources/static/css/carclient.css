@@ -347,3 +347,46 @@ body {
         justify-self: start;
     }
 }
+
+@media (max-width: 480px) {
+    .nav {
+        gap: 24px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .cart-page {
+        padding: 14px 12px 44px;
+    }
+
+    .cart-item {
+        padding: 16px;
+        gap: 10px;
+    }
+
+    .item-image {
+        width: 68px;
+        height: 68px;
+    }
+
+    .item-info h2 {
+        font-size: 1rem;
+    }
+
+    .item-price {
+        font-size: 1.2rem;
+    }
+
+    /* Campos del formulario de pago en columna única */
+    .payment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-card {
+        padding: 22px 18px 26px;
+    }
+
+    .summary-card h1 {
+        font-size: 1.1rem;
+    }
+}

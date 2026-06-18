@@ -5,6 +5,22 @@ const METODO_LABEL = {
     TRANSFERENCIA: 'Transferencia'
 };
 
+const ESTADO_LABEL = {
+    PENDIENTE:       'PENDIENTE',
+    PENDIENTE_PAGO:  'CANCELADO',
+    PAGADA:          'PAGADA',
+    PAGO_RECHAZADO:  'PAGO RECHAZADO',
+    PAGO_CANCELADO:  'PAGO CANCELADO',
+    EN_PROCESO:      'EN PROCESO',
+    ENVIADA:         'ENVIADA',
+    ENTREGADA:       'ENTREGADA',
+    CANCELADA:       'CANCELADA'
+};
+
+const ESTADO_CLASS_OVERRIDE = {
+    PENDIENTE_PAGO: 'cancelada'
+};
+
 async function loadOrders() {
     const userId = getUserId();
     if (!userId) {
@@ -56,7 +72,8 @@ function renderOrders(orders) {
 
     list.innerHTML = sorted.map(o => {
         const estado      = o.estado || 'PENDIENTE';
-        const estadoClass = estado.toLowerCase().replace(/_/g, '-');
+        const estadoLabel = ESTADO_LABEL[estado] || estado.replace(/_/g, ' ');
+        const estadoClass = ESTADO_CLASS_OVERRIDE[estado] || estado.toLowerCase().replace(/_/g, '-');
         const detalles    = Array.isArray(o.detalles) ? o.detalles : [];
         const metodoPago  = METODO_LABEL[o.metodoPago] || o.metodoPago || '—';
 
@@ -100,7 +117,7 @@ function renderOrders(orders) {
                     <h2>ORD-${String(o.idVenta).padStart(4, '0')}</h2>
                     <span>${fechaStr}</span>
                 </div>
-                <strong class="badge ${estadoClass}">${estado.replace(/_/g, ' ')}</strong>
+                <strong class="badge ${estadoClass}">${estadoLabel}</strong>
             </div>
             ${productosHtml}
             ${masProductos}

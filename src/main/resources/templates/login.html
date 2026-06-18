@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -94,15 +94,11 @@
                     Iniciar sesión
                 </button>
 
-                <div style="margin-top: 1.5rem;">
-                    <a th:href="@{/forgot-password}"
-                       style="display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; border: 1px solid #8de4ac; border-radius: 9px; background: #c7f6d8; color: #2ea850; text-decoration: none; font-weight: 800;">
-                        <span style="display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #35c85a; color: #fff; font-size: 1.2rem;">☎</span>
-                        <span style="line-height: 1.1;">
-                                ¿Olvidaste tu contraseña?<br>
-                                <small style="font-weight: 700;">Contáctanos por WhatsApp</small>
-                            </span>
-                    </a>
+                <div style="margin-top: 1.2rem; text-align: center;">
+                    <button type="button" onclick="openForgotPassword()"
+                            style="background: none; border: none; cursor: pointer; color: var(--primary); font-size: 0.85rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; padding: 4px 0;">
+                        &iquest;Olvidaste tu contrasena? Recupérala aqui
+                    </button>
                 </div>
 
                 <footer class="form-footer"
@@ -116,8 +112,92 @@
     </main>
 </div>
 
+<!-- ── Modal Paso 1: Solicitar codigo ──────────────────────────────────── -->
+<div class="modal-overlay" id="fp-step-1">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Recuperar contrasena</h2>
+            <button class="modal-close" type="button" onclick="closeForgotModals()">&#x2715;</button>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0 0 18px; line-height: 1.5;">
+            Ingresa el correo registrado en tu cuenta y te enviaremos un codigo de 6 digitos.
+        </p>
+        <div class="modal-body">
+            <label class="field">
+                <span>Correo electronico</span>
+                <input type="email" id="fpEmailInput" placeholder="tu@correo.com" autocomplete="email">
+            </label>
+            <p class="form-message" id="fpMsg1" aria-live="polite"></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="button button-light" onclick="closeForgotModals()">Cancelar</button>
+            <button type="button" class="button button-primary" id="fpBtn1"
+                    data-label="Enviar codigo" onclick="fpSolicitarReset()">Enviar codigo</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modal Paso 2: Verificar codigo ─────────────────────────────────── -->
+<div class="modal-overlay" id="fp-step-2">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Ingresa el codigo</h2>
+            <button class="modal-close" type="button" onclick="closeForgotModals()">&#x2715;</button>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0 0 18px; line-height: 1.5;">
+            Enviamos un codigo de 6 digitos a
+            <strong id="fpEmailDisplay" style="color: var(--text-dark);"></strong>.
+            Revisa tu bandeja de entrada o spam.
+        </p>
+        <div class="modal-body">
+            <label class="field">
+                <span>Codigo de 6 digitos</span>
+                <input type="text" id="fpCodigoInput" placeholder="000000"
+                       maxlength="6" inputmode="numeric" autocomplete="one-time-code"
+                       style="letter-spacing: 0.3em; font-size: 1.3rem; text-align: center;">
+            </label>
+            <p class="form-message" id="fpMsg2" aria-live="polite"></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="button button-light" onclick="goToFpStep(1)">Volver</button>
+            <button type="button" class="button button-primary" id="fpBtn2"
+                    data-label="Verificar" onclick="fpVerificarCodigo()">Verificar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modal Paso 3: Nueva contrasena ─────────────────────────────────── -->
+<div class="modal-overlay" id="fp-step-3">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Nueva contrasena</h2>
+            <button class="modal-close" type="button" onclick="closeForgotModals()">&#x2715;</button>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0 0 18px; line-height: 1.5;">
+            Elige una nueva contrasena segura de al menos 6 caracteres.
+        </p>
+        <div class="modal-body">
+            <label class="field">
+                <span>Nueva contrasena</span>
+                <input type="password" id="fpNuevaPass" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" autocomplete="new-password">
+            </label>
+            <label class="field">
+                <span>Confirmar contrasena</span>
+                <input type="password" id="fpConfirmaPass" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" autocomplete="new-password">
+            </label>
+            <p class="form-message" id="fpMsg3" aria-live="polite"></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="button button-light" onclick="closeForgotModals()">Cancelar</button>
+            <button type="button" class="button button-primary" id="fpBtn3"
+                    data-label="Cambiar contrasena" onclick="fpCambiarPassword()">Cambiar contrasena</button>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts separados -->
 <script th:src="@{/js/login.js}"></script>
+<script th:src="@{/js/forgot-password.js}"></script>
 </body>
 
 </html>

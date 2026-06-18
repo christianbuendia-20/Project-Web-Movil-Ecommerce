@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:replace="~{fragments/layout :: head('Panel de Cliente')}"></th:block>
@@ -32,39 +32,23 @@
             <h2>Productos recomendados</h2>
 
             <div class="products-grid">
-                <article class="product-card">
+                <article class="product-card" th:each="producto : ${topProductos}">
                     <div class="product-image">
-                        <span>🖥️</span>
+                        <img th:if="${producto.imagenUrl != null and !#strings.isEmpty(producto.imagenUrl)}"
+                             th:src="${producto.imagenUrl}"
+                             th:alt="${producto.nombre}"
+                             style="width:100%;height:100%;object-fit:cover;">
+                        <span th:unless="${producto.imagenUrl != null and !#strings.isEmpty(producto.imagenUrl)}">&#128187;</span>
                     </div>
 
                     <div class="product-info">
-                        <h3>Panel HMI 7” Touchscreen</h3>
-                        <p>PANEL HMI · HMI-001</p>
+                        <h3 th:text="${producto.nombre}">Nombre del producto</h3>
+                        <p th:text="${producto.nombreCategoria}">Categoria</p>
 
                         <div class="product-footer">
                             <div>
-                                <strong>S/1290</strong>
-                                <small>En stock · 5 und.</small>
-                            </div>
-
-                            <a th:href="@{/catalogclient}" class="add-button">+ Agregar</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="product-card">
-                    <div class="product-image">
-                        <span>🖥️</span>
-                    </div>
-
-                    <div class="product-info">
-                        <h3>Módulo Remoto Analógico</h3>
-                        <p>MÓDULO REMOTO · MOD-002</p>
-
-                        <div class="product-footer">
-                            <div>
-                                <strong>S/1100</strong>
-                                <small>En stock · 5 und.</small>
+                                <strong th:text="${'S/' + #numbers.formatDecimal(producto.precio, 1, 0)}">S/0</strong>
+                                <small th:text="${'En stock: ' + producto.stock + ' und.'}">En stock</small>
                             </div>
 
                             <a th:href="@{/catalogclient}" class="add-button">+ Agregar</a>

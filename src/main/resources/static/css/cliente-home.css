@@ -171,4 +171,44 @@ body {
         grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
         justify-items: center;
     }
+
+    /* Ancho fijo del card libera al grid para colocarlo en columnas */
+    .product-card {
+        width: 100%;
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-client {
+        padding: 26px 18px;
+        min-height: auto;
+    }
+
+    .hero-content h1 {
+        font-size: 1.3rem;
+    }
+
+    .hero-content h2 {
+        font-size: 1rem;
+    }
+
+    .hero-content p {
+        font-size: 0.9rem;
+    }
+
+    .recommended-section {
+        padding: 16px 14px 40px;
+    }
+
+    /* Una columna centrada en pantallas muy pequeñas */
+    .products-grid {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+    }
+
+    .product-card {
+        width: 100%;
+        max-width: 100%;
+    }
 }

@@ -344,3 +344,39 @@ body {
         gap: 14px;
     }
 }
+
+@media (max-width: 480px) {
+    .nav {
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .orders-page {
+        padding: 14px 10px 28px;
+    }
+
+    /* Encabezado de tarjeta: badge y número de pedido en dos líneas */
+    .order-header {
+        flex-wrap: wrap;
+        gap: 6px;
+        min-height: auto;
+        padding: 10px 16px 8px;
+    }
+
+    .order-header h2 {
+        font-size: 0.95rem;
+    }
+
+    /* Tracker: scroll horizontal en pantallas muy pequeñas */
+    .tracker {
+        overflow-x: auto;
+        padding: 10px 14px;
+        gap: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .page-title h1 {
+        font-size: 1.45rem;
+    }
+}

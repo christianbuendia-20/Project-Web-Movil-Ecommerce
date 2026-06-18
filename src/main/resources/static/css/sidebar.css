@@ -137,3 +137,40 @@
         align-items: flex-start;
     }
 }
+
+@media (max-width: 480px) {
+    .admin-page {
+        padding: 14px 10px;
+    }
+
+    .content {
+        padding: 18px 12px;
+    }
+
+    .content-header h1 {
+        font-size: 1.2rem;
+    }
+
+    /* Menú lateral horizontal en móvil (scrollable) */
+    .sidebar nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .menu-section {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .menu-items {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .menu-item {
+        flex: 1 1 auto;
+        min-width: 120px;
+        justify-content: center;
+    }
+}

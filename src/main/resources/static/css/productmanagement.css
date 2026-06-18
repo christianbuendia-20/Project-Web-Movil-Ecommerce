@@ -221,3 +221,24 @@ body {
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     }
 }
+
+@media (max-width: 640px) {
+    .topbar {
+        height: auto;
+        padding: 14px 18px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .admin-profile {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 400px) {
+    .product-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
